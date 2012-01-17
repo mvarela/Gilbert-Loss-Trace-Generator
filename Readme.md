@@ -1,6 +1,6 @@
 # Gilbert Loss Trace Generator
 
-Martin Varela, 2012
+Martin Varela (martin.varela@vtt.fi), 2012
 
 ## Introduction 
 
