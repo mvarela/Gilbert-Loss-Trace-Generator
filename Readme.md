@@ -8,7 +8,7 @@ Martin Varela, 2012
 pre–defined target values) loss traces following a simplified Gilbert loss model
 (2-states, one with no losses, and one with loss probability = 1). For
 subjective testing, the challenge lies in getting the right stats within a few
-hundred packets, as test sequences are only $\sim 10s$ long. We take a
+hundred packets, as test sequences are only ~10s long. We take a
 brute-force approach, generating several samples per combination of loss–rate
 and mean loss burst size until enough sufficiently good traces are generated.
 
