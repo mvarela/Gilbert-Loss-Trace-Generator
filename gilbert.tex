@@ -1,0 +1,738 @@
+\documentclass{article}
+%% ODER: format ==         = "\mathrel{==}"
+%% ODER: format /=         = "\neq "
+%
+%
+\makeatletter
+\@ifundefined{lhs2tex.lhs2tex.sty.read}%
+  {\@namedef{lhs2tex.lhs2tex.sty.read}{}%
+   \newcommand\SkipToFmtEnd{}%
+   \newcommand\EndFmtInput{}%
+   \long\def\SkipToFmtEnd#1\EndFmtInput{}%
+  }\SkipToFmtEnd
+
+\newcommand\ReadOnlyOnce[1]{\@ifundefined{#1}{\@namedef{#1}{}}\SkipToFmtEnd}
+\usepackage{amstext}
+\usepackage{amssymb}
+\usepackage{stmaryrd}
+\DeclareFontFamily{OT1}{cmtex}{}
+\DeclareFontShape{OT1}{cmtex}{m}{n}
+  {<5><6><7><8>cmtex8
+   <9>cmtex9
+   <10><10.95><12><14.4><17.28><20.74><24.88>cmtex10}{}
+\DeclareFontShape{OT1}{cmtex}{m}{it}
+  {<-> ssub * cmtt/m/it}{}
+\newcommand{\texfamily}{\fontfamily{cmtex}\selectfont}
+\DeclareFontShape{OT1}{cmtt}{bx}{n}
+  {<5><6><7><8>cmtt8
+   <9>cmbtt9
+   <10><10.95><12><14.4><17.28><20.74><24.88>cmbtt10}{}
+\DeclareFontShape{OT1}{cmtex}{bx}{n}
+  {<-> ssub * cmtt/bx/n}{}
+\newcommand{\tex}[1]{\text{\texfamily#1}}	% NEU
+
+\newcommand{\Sp}{\hskip.33334em\relax}
+
+
+\newcommand{\Conid}[1]{\mathit{#1}}
+\newcommand{\Varid}[1]{\mathit{#1}}
+\newcommand{\anonymous}{\kern0.06em \vbox{\hrule\@width.5em}}
+\newcommand{\plus}{\mathbin{+\!\!\!+}}
+\newcommand{\bind}{\mathbin{>\!\!\!>\mkern-6.7mu=}}
+\newcommand{\rbind}{\mathbin{=\mkern-6.7mu<\!\!\!<}}% suggested by Neil Mitchell
+\newcommand{\sequ}{\mathbin{>\!\!\!>}}
+\renewcommand{\leq}{\leqslant}
+\renewcommand{\geq}{\geqslant}
+\usepackage{polytable}
+
+%mathindent has to be defined
+\@ifundefined{mathindent}%
+  {\newdimen\mathindent\mathindent\leftmargini}%
+  {}%
+
+\def\resethooks{%
+  \global\let\SaveRestoreHook\empty
+  \global\let\ColumnHook\empty}
+\newcommand*{\savecolumns}[1][default]%
+  {\g@addto@macro\SaveRestoreHook{\savecolumns[#1]}}
+\newcommand*{\restorecolumns}[1][default]%
+  {\g@addto@macro\SaveRestoreHook{\restorecolumns[#1]}}
+\newcommand*{\aligncolumn}[2]%
+  {\g@addto@macro\ColumnHook{\column{#1}{#2}}}
+
+\resethooks
+
+\newcommand{\onelinecommentchars}{\quad-{}- }
+\newcommand{\commentbeginchars}{\enskip\{-}
+\newcommand{\commentendchars}{-\}\enskip}
+
+\newcommand{\visiblecomments}{%
+  \let\onelinecomment=\onelinecommentchars
+  \let\commentbegin=\commentbeginchars
+  \let\commentend=\commentendchars}
+
+\newcommand{\invisiblecomments}{%
+  \let\onelinecomment=\empty
+  \let\commentbegin=\empty
+  \let\commentend=\empty}
+
+\visiblecomments
+
+\newlength{\blanklineskip}
+\setlength{\blanklineskip}{0.66084ex}
+
+\newcommand{\hsindent}[1]{\quad}% default is fixed indentation
+\let\hspre\empty
+\let\hspost\empty
+\newcommand{\NB}{\textbf{NB}}
+\newcommand{\Todo}[1]{$\langle$\textbf{To do:}~#1$\rangle$}
+
+\EndFmtInput
+\makeatother
+%
+%
+%
+%
+%
+%
+% This package provides two environments suitable to take the place
+% of hscode, called "plainhscode" and "arrayhscode". 
+%
+% The plain environment surrounds each code block by vertical space,
+% and it uses \abovedisplayskip and \belowdisplayskip to get spacing
+% similar to formulas. Note that if these dimensions are changed,
+% the spacing around displayed math formulas changes as well.
+% All code is indented using \leftskip.
+%
+% Changed 19.08.2004 to reflect changes in colorcode. Should work with
+% CodeGroup.sty.
+%
+\ReadOnlyOnce{polycode.fmt}%
+\makeatletter
+
+\newcommand{\hsnewpar}[1]%
+  {{\parskip=0pt\parindent=0pt\par\vskip #1\noindent}}
+
+% can be used, for instance, to redefine the code size, by setting the
+% command to \small or something alike
+\newcommand{\hscodestyle}{}
+
+% The command \sethscode can be used to switch the code formatting
+% behaviour by mapping the hscode environment in the subst directive
+% to a new LaTeX environment.
+
+\newcommand{\sethscode}[1]%
+  {\expandafter\let\expandafter\hscode\csname #1\endcsname
+   \expandafter\let\expandafter\endhscode\csname end#1\endcsname}
+
+% "compatibility" mode restores the non-polycode.fmt layout.
+
+\newenvironment{compathscode}%
+  {\par\noindent
+   \advance\leftskip\mathindent
+   \hscodestyle
+   \let\\=\@normalcr
+   \let\hspre\(\let\hspost\)%
+   \pboxed}%
+  {\endpboxed\)%
+   \par\noindent
+   \ignorespacesafterend}
+
+\newcommand{\compaths}{\sethscode{compathscode}}
+
+% "plain" mode is the proposed default.
+% It should now work with \centering.
+% This required some changes. The old version
+% is still available for reference as oldplainhscode.
+
+\newenvironment{plainhscode}%
+  {\hsnewpar\abovedisplayskip
+   \advance\leftskip\mathindent
+   \hscodestyle
+   \let\hspre\(\let\hspost\)%
+   \pboxed}%
+  {\endpboxed%
+   \hsnewpar\belowdisplayskip
+   \ignorespacesafterend}
+
+\newenvironment{oldplainhscode}%
+  {\hsnewpar\abovedisplayskip
+   \advance\leftskip\mathindent
+   \hscodestyle
+   \let\\=\@normalcr
+   \(\pboxed}%
+  {\endpboxed\)%
+   \hsnewpar\belowdisplayskip
+   \ignorespacesafterend}
+
+% Here, we make plainhscode the default environment.
+
+\newcommand{\plainhs}{\sethscode{plainhscode}}
+\newcommand{\oldplainhs}{\sethscode{oldplainhscode}}
+\plainhs
+
+% The arrayhscode is like plain, but makes use of polytable's
+% parray environment which disallows page breaks in code blocks.
+
+\newenvironment{arrayhscode}%
+  {\hsnewpar\abovedisplayskip
+   \advance\leftskip\mathindent
+   \hscodestyle
+   \let\\=\@normalcr
+   \(\parray}%
+  {\endparray\)%
+   \hsnewpar\belowdisplayskip
+   \ignorespacesafterend}
+
+\newcommand{\arrayhs}{\sethscode{arrayhscode}}
+
+% The mathhscode environment also makes use of polytable's parray 
+% environment. It is supposed to be used only inside math mode 
+% (I used it to typeset the type rules in my thesis).
+
+\newenvironment{mathhscode}%
+  {\parray}{\endparray}
+
+\newcommand{\mathhs}{\sethscode{mathhscode}}
+
+% texths is similar to mathhs, but works in text mode.
+
+\newenvironment{texthscode}%
+  {\(\parray}{\endparray\)}
+
+\newcommand{\texths}{\sethscode{texthscode}}
+
+% The framed environment places code in a framed box.
+
+\def\codeframewidth{\arrayrulewidth}
+\RequirePackage{calc}
+
+\newenvironment{framedhscode}%
+  {\parskip=\abovedisplayskip\par\noindent
+   \hscodestyle
+   \arrayrulewidth=\codeframewidth
+   \tabular{@{}|p{\linewidth-2\arraycolsep-2\arrayrulewidth-2pt}|@{}}%
+   \hline\framedhslinecorrect\\{-1.5ex}%
+   \let\endoflinesave=\\
+   \let\\=\@normalcr
+   \(\pboxed}%
+  {\endpboxed\)%
+   \framedhslinecorrect\endoflinesave{.5ex}\hline
+   \endtabular
+   \parskip=\belowdisplayskip\par\noindent
+   \ignorespacesafterend}
+
+\newcommand{\framedhslinecorrect}[2]%
+  {#1[#2]}
+
+\newcommand{\framedhs}{\sethscode{framedhscode}}
+
+% The inlinehscode environment is an experimental environment
+% that can be used to typeset displayed code inline.
+
+\newenvironment{inlinehscode}%
+  {\(\def\column##1##2{}%
+   \let\>\undefined\let\<\undefined\let\\\undefined
+   \newcommand\>[1][]{}\newcommand\<[1][]{}\newcommand\\[1][]{}%
+   \def\fromto##1##2##3{##3}%
+   \def\nextline{}}{\) }%
+
+\newcommand{\inlinehs}{\sethscode{inlinehscode}}
+
+% The joincode environment is a separate environment that
+% can be used to surround and thereby connect multiple code
+% blocks.
+
+\newenvironment{joincode}%
+  {\let\orighscode=\hscode
+   \let\origendhscode=\endhscode
+   \def\endhscode{\def\hscode{\endgroup\def\@currenvir{hscode}\\}\begingroup}
+   %\let\SaveRestoreHook=\empty
+   %\let\ColumnHook=\empty
+   %\let\resethooks=\empty
+   \orighscode\def\hscode{\endgroup\def\@currenvir{hscode}}}%
+  {\origendhscode
+   \global\let\hscode=\orighscode
+   \global\let\endhscode=\origendhscode}%
+
+\makeatother
+\EndFmtInput
+%
+\usepackage{graphicx}
+%\usepackage{listings}
+
+
+
+\begin{document}
+\title{Gilbert Loss Trace Generator}
+\author{ Mart\'\i n Varela - VTT}
+
+\maketitle
+
+
+\abstract{ This program allows the generation of several accurate (with respect
+to pre--defined target values) loss traces following a simplified Gilbert loss
+model (2-states, one with no losses, and one with loss probability = 1). For
+subjective testing, the challenge lies in getting the right stats within a few
+hundred packets, as test sequences are only $\sim 10s$ long. We take a
+brute-force approach, generating several samples per combination of loss--rate
+and mean loss burst size until enough  sufficiently good traces are generated.  }
+
+\section{Preliminaries}
+
+We will define our  $Main$ module and import some standard library functions and types.
+
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\mathbf{module}\;\Conid{Main}\;\mathbf{where}{}\<[E]%
+\\
+\>[B]{}\mathbf{import}\;\Conid{\Conid{Data}.List}{}\<[E]%
+\\
+\>[B]{}\mathbf{import}\;\Conid{\Conid{System}.Random}{}\<[E]%
+\\
+\>[B]{}\mathbf{import}\;\Conid{\Conid{System}.Environment}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+
+\section{Packet Sequences}
+
+A network flow is represented by a sequence of packets, which either arrive at 
+their destination, or don't. We model this by the type $Packet$, defined as 
+follows:
+
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\mathbf{data}\;\Conid{Packet}\mathrel{=}\Conid{P\char95 OK}\mid \Conid{P\char95 LOST}\;\mathbf{deriving}\;\Conid{Eq}{}\<[E]%
+\\
+\>[B]{}\mathbf{instance}\;\Conid{Show}\;\Conid{Packet}\;\mathbf{where}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{show}\;\Conid{P\char95 OK}\mathrel{=}\text{\tt \char34 0\char34}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{show}\;\Conid{P\char95 LOST}\mathrel{=}\text{\tt \char34 1\char34}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+
+\section{Valid Sequences}
+\label{sec:valid}
+
+ For a given sequence of packets $\sigma$, and target values for the loss rate
+and mean loss burst size, $LR_{t}$ and $MLBS_{t}$ respectively, we consider
+$\sigma$ to be suitable if the difference of the observed loss rate and MLBS in
+the sequence, $LR_{\sigma}$ and $MLBS_{\sigma}$ and the target values is lower
+than a given threshold.
+
+We will define the thresholds at a $5\%$ of $LR_{t}$ for the loss rate, and 0.1
+packets for the mean loss burst size., and so our conditions for accepting a 
+sequence as valid are
+$$
+\mid LR_t - LR_{ \sigma }\mid \leq 0.05 \times LR_{t}
+$$
+and
+$$
+\mid MLBS_{t} - MLBS_{ \sigma }\mid \leq 0.1
+$$
+
+There is an issue when the definition of the mean loss burst size when no losses
+occur. For some applications, it may be convenient to define it as 1, while in
+other cases it might be better to define it as 0 (as indeed, if there are no
+losses, speaking of the mean loss burst size does not make sense). However, for
+QoE estimation purposes using PSQA or a similar technique, defining it as 0
+might be problematic as it introduces a discontinuity in the mean loss burst
+size axis (i.e. when there are losses, for any loss rate, the mean size of each
+burst is at least 1). We will, therefore, define the mean loss burst size
+of a lossless sequence as 1, define our functions accordingly.\\
+
+We then have:
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{15}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{27}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{29}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{checkSequence}\mathbin{::}\Conid{Double}\to \Conid{Double}\to [\mskip1.5mu \Conid{Packet}\mskip1.5mu]\to \Conid{Bool}{}\<[E]%
+\\
+\>[B]{}\Varid{checkSequence}\;\Varid{tlr}\;\Varid{tmlbs}\;\Varid{s}{}\<[E]%
+\\
+\>[B]{}\hsindent{15}{}\<[15]%
+\>[15]{}\mid \Varid{tlr}\mathbin{>}\mathrm{0}{}\<[27]%
+\>[27]{}\mathrel{=}(\Varid{abs}\mathbin{\$}\Varid{tlr}\mathbin{-}\Varid{lr}\;\Varid{s})\leq \mathrm{0.05}\mathbin{*}\Varid{tlr}\mathrel{\wedge}{}\<[E]%
+\\
+\>[27]{}\hsindent{2}{}\<[29]%
+\>[29]{}(\Varid{abs}\mathbin{\$}\Varid{tmlbs}\mathbin{-}\Varid{mlbs}\;\Varid{s})\leq \mathrm{0.1}{}\<[E]%
+\\
+\>[B]{}\hsindent{15}{}\<[15]%
+\>[15]{}\mid \Varid{otherwise}\mathrel{=}\Varid{lr}\;\Varid{s}\equiv \mathrm{0}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+
+We calculate the loss rate in the sequence by counting the number of lost
+packets and dividing over the sequence length.  
+
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{9}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{lr}\;\Varid{xs}\mathrel{=}(\Varid{fromIntegral}\mathbin{\circ}\Varid{length}\mathbin{\circ}\Varid{filter}\;(\equiv \Conid{P\char95 LOST})\mathbin{\$}\Varid{xs})\mathbin{/}{}\<[E]%
+\\
+\>[B]{}\hsindent{9}{}\<[9]%
+\>[9]{}(\Varid{fromIntegral}\mathbin{\circ}\Varid{length}\mathbin{\$}\Varid{xs}){}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+
+The mean loss burst size is calculated as the average of the lengths of loss
+events (i.e. instances where one or more packets are lost). To this end we
+extract the loss events from the sequence, and calculate the average of their
+lengths. As discussed above, if there are no losses, then we define the mean
+loss burst size as one.
+
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{5}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{6}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{16}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{28}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{30}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{mlbs}\;\Varid{xs}{}\<[E]%
+\\
+\>[B]{}\hsindent{6}{}\<[6]%
+\>[6]{}\mid \Varid{length}\;\Varid{l\char95 events}\mathbin{>}\mathrm{0}\mathrel{=}(\Varid{fromIntegral}\mathbin{\circ}\Varid{sum}\mathbin{\circ}\Varid{map}\;\Varid{length}\mathbin{\$}\Varid{l\char95 events})\mathbin{/}{}\<[E]%
+\\
+\>[6]{}\hsindent{24}{}\<[30]%
+\>[30]{}(\Varid{fromIntegral}\mathbin{\circ}\Varid{length}\mathbin{\$}\Varid{l\char95 events}){}\<[E]%
+\\
+\>[B]{}\hsindent{6}{}\<[6]%
+\>[6]{}\mid \Varid{otherwise}{}\<[28]%
+\>[28]{}\mathrel{=}\mathrm{1}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\mathbf{where}{}\<[E]%
+\\
+\>[3]{}\hsindent{2}{}\<[5]%
+\>[5]{}\Varid{l\char95 events}\mathrel{=}(\Varid{filter}\;(\lambda \Varid{e}\to \Varid{head}\;\Varid{e}\equiv \Conid{P\char95 LOST}))\mathbin{\circ}{}\<[E]%
+\\
+\>[5]{}\hsindent{11}{}\<[16]%
+\>[16]{}(\Varid{groupBy}\;(\lambda \Varid{x}\;\Varid{y}\to \Varid{x}\equiv \Varid{y}\mathrel{\wedge}\Varid{y}\equiv \Conid{P\char95 LOST}))\mathbin{\$}\Varid{xs}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+
+
+\section{Sequence Generation}
+
+In order to generate sequences with the desired loss process, we need to
+calculate, from the target parameters $LR_t$ and $MLBS_t$, the probabilities for
+the simplified Gilbert model. The conversion is given by
+$$
+ p = \frac{1}{MLBS_t}\frac{LR_t}{1-LR_t}
+$$
+and 
+$$
+q = \frac{1}{MLBS_t}
+$$
+where $p$ and $q$ correspond to the probabilities of going from the no--loss
+state to the loss state, and vice--versa, respectively, as seen in Figure~\ref{fig:gilbert}.  
+
+\begin{figure}[h]
+\centering
+\includegraphics[scale=0.2]{figs/gilbert_simplified.pdf}
+\caption{The simplified Gilbert model.}
+\label{fig:gilbert}
+\end{figure}
+
+
+Sequences need to be generated with a pre--defined length, and we will need to
+obtain several different sequences with similar statistical loss behavior. So if
+we want to obtain $k$ sequences with a certain loss rate $tlr$ and mean loss
+burst size $tmlbs$ within a certain tolerance as defined in
+Section~\ref{sec:valid}, then we can imagine generating an infinite list of
+sequences $ls$ with the target parameters and selecting from those the first $k$
+sequences that are valid.
+
+We can then write
+
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{33}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{selectSequences}\mathbin{::}\Conid{Int}\to \Conid{Double}\to \Conid{Double}\to [\mskip1.5mu [\mskip1.5mu \Conid{Packet}\mskip1.5mu]\mskip1.5mu]\to [\mskip1.5mu [\mskip1.5mu \Conid{Packet}\mskip1.5mu]\mskip1.5mu]{}\<[E]%
+\\
+\>[B]{}\Varid{selectSequences}\;\Varid{k}\;\Varid{tlr}\;\Varid{tmlbs}\;\Varid{s}\mathrel{=}\Varid{take}\;\Varid{k}\mathbin{\$}{}\<[E]%
+\\
+\>[B]{}\hsindent{33}{}\<[33]%
+\>[33]{}\Varid{filter}\;(\Varid{checkSequence}\;\Varid{tlr}\;\Varid{tmlbs})\;\Varid{s}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+
+It now remains the task of generating the actual sequences with the desired
+targets.  Since it would be useful to obtain repeatable traces, we start by
+taking a seed as an argument. We'll use that seed to generate a pseudo--random
+sequence of integer seeds for creating new generators for the actual packet loss
+sequences.  In this way, we get the repeatability, and we keep a larger portion
+of the code pure.
+
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{seeds}\;\Varid{s}\mathrel{=}(\Varid{randoms}\mathbin{\$}\Varid{mkStdGen}\;\Varid{s})\mathbin{::}[\mskip1.5mu \Conid{Int}\mskip1.5mu]{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+
+In order to generate the sequences, we need to implement the two--state Markov
+chain depicted in Figure~\ref{fig:gilbert}. We use one of the previously
+generated seeds to feed a new generator, and use this to simulate the chain.
+So, the creation of a sequences takes as arguments the transition probabilities
+for the Markov chain, the desired sequence length, and a seed for the
+pseudo--random number generator. We always start from a loss--free state.
+
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{5}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{8}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{11}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{23}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{createSequence}\mathbin{::}\Conid{Double}\to \Conid{Double}\to \Conid{Int}\to \Conid{Int}\to [\mskip1.5mu \Conid{Packet}\mskip1.5mu]{}\<[E]%
+\\
+\>[B]{}\Varid{createSequence}\;\Varid{tlr}\;\Varid{tmlbs}\;\Varid{k}\;\Varid{s}\mathrel{=}\Varid{unfoldr}\;\Varid{fgen}\;(\Varid{p},\Varid{q},\Conid{P\char95 OK},\Varid{probs}){}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\mathbf{where}{}\<[E]%
+\\
+\>[3]{}\hsindent{2}{}\<[5]%
+\>[5]{}\Varid{probs}\mathrel{=}\Varid{take}\;\Varid{k}\mathbin{\$}{}\<[23]%
+\>[23]{}(\Varid{randoms}\mathbin{\$}\Varid{mkStdGen}\;\Varid{s})\mathbin{::}[\mskip1.5mu \Conid{Double}\mskip1.5mu]{}\<[E]%
+\\
+\>[3]{}\hsindent{2}{}\<[5]%
+\>[5]{}\Varid{p}{}\<[11]%
+\>[11]{}\mathrel{=}(\Varid{tlr}\mathbin{/}(\mathrm{1}\mathbin{-}\Varid{tlr}))\mathbin{/}\Varid{mbs}{}\<[E]%
+\\
+\>[3]{}\hsindent{2}{}\<[5]%
+\>[5]{}\Varid{q}{}\<[11]%
+\>[11]{}\mathrel{=}\mathrm{1}\mathbin{/}\Varid{mbs}{}\<[E]%
+\\
+\>[3]{}\hsindent{2}{}\<[5]%
+\>[5]{}\Varid{mbs}{}\<[E]%
+\\
+\>[5]{}\hsindent{3}{}\<[8]%
+\>[8]{}\mid \Varid{tmlbs}\mathbin{>}\mathrm{0}\mathrel{=}\Varid{tmlbs}{}\<[E]%
+\\
+\>[5]{}\hsindent{3}{}\<[8]%
+\>[8]{}\mid \Varid{otherwise}\mathrel{=}\mathrm{1}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+ 
+ \begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{5}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{7}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{9}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{14}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{17}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{fgen}\mathbin{::}(\Conid{Double},\Conid{Double},\Conid{Packet},[\mskip1.5mu \Conid{Double}\mskip1.5mu])\to {}\<[E]%
+\\
+\>[B]{}\hsindent{9}{}\<[9]%
+\>[9]{}\Conid{Maybe}\;(\Conid{Packet},(\Conid{Double},\Conid{Double},\Conid{Packet},[\mskip1.5mu \Conid{Double}\mskip1.5mu])){}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\Varid{fgen}\;(\anonymous ,\anonymous ,\anonymous ,[\mskip1.5mu \mskip1.5mu])\mathrel{=}\Conid{Nothing}{}\<[E]%
+\\
+\>[B]{}\Varid{fgen}\;(\Varid{p},\Varid{q},\Varid{current},\Varid{probs})\mathrel{=}\Conid{Just}\;(\Varid{next},(\Varid{p},\Varid{q},\Varid{next},\Varid{tail}\;\Varid{probs})){}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\mathbf{where}{}\<[E]%
+\\
+\>[3]{}\hsindent{2}{}\<[5]%
+\>[5]{}\Varid{next}\mathrel{=}\mathbf{case}\;\Varid{current}\;\mathbf{of}{}\<[E]%
+\\
+\>[5]{}\hsindent{2}{}\<[7]%
+\>[7]{}\Conid{P\char95 OK}{}\<[14]%
+\>[14]{}\to \mathbf{if}\;(\Varid{p}\leq \Varid{head}\;\Varid{probs}){}\<[E]%
+\\
+\>[14]{}\hsindent{3}{}\<[17]%
+\>[17]{}\mathbf{then}\;\Conid{P\char95 OK}{}\<[E]%
+\\
+\>[14]{}\hsindent{3}{}\<[17]%
+\>[17]{}\mathbf{else}\;\Conid{P\char95 LOST}{}\<[E]%
+\\
+\>[5]{}\hsindent{2}{}\<[7]%
+\>[7]{}\Conid{P\char95 LOST}\to \mathbf{if}\;(\Varid{q}\leq \Varid{head}\;\Varid{probs}){}\<[E]%
+\\
+\>[7]{}\hsindent{10}{}\<[17]%
+\>[17]{}\mathbf{then}\;\Conid{P\char95 LOST}{}\<[E]%
+\\
+\>[7]{}\hsindent{10}{}\<[17]%
+\>[17]{}\mathbf{else}\;\Conid{P\char95 OK}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+
+Having the means to generate sequences with the desired target loss
+characteristics, we just create an infinite list of such sequences, from which
+we will then choose as many as we need. It should be noted that depending on the
+target values and tolerances, this might result in a non--halting computation,
+as some combinations of target values and sequence length are not feasible.
+
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{sequences}\mathbin{::}\Conid{Double}\to \Conid{Double}\to \Conid{Int}\to \Conid{Int}\to [\mskip1.5mu [\mskip1.5mu \Conid{Packet}\mskip1.5mu]\mskip1.5mu]{}\<[E]%
+\\
+\>[B]{}\Varid{sequences}\;\Varid{tlr}\;\Varid{tmlbs}\;\Varid{k}\;\Varid{s}\mathrel{=}\Varid{map}\;(\Varid{createSequence}\;\Varid{tlr}\;\Varid{tmlbs}\;\Varid{k})\mathbin{\$}\Varid{seeds}\;\Varid{s}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+
+
+With the sequence generation solved, we can now build the rest of the program,
+which will take arguments for the target loss rate, the target mean loss burst
+size, the length of the sequences to be generated, the number of sequences to be
+generated, and a seed for the RNG. The program will then create a file per
+sequence generated, and a file with the actual loss rates and mean loss burst 
+sizes of the sequences generated, for validation purposes.
+
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{5}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{7}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{14}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{16}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{main}\mathrel{=}\mathbf{do}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{args}\leftarrow \Varid{getArgs}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\mathbf{let}\;\Varid{tlr}{}\<[14]%
+\>[14]{}\mathrel{=}\Varid{read}\mathbin{\$}\Varid{args}\mathbin{!!}\mathrm{0}\mathbin{::}\Conid{Double}{}\<[E]%
+\\
+\>[3]{}\hsindent{4}{}\<[7]%
+\>[7]{}\Varid{tmlbs}{}\<[14]%
+\>[14]{}\mathrel{=}\Varid{read}\mathbin{\$}\Varid{args}\mathbin{!!}\mathrm{1}\mathbin{::}\Conid{Double}{}\<[E]%
+\\
+\>[3]{}\hsindent{4}{}\<[7]%
+\>[7]{}\Varid{lenS}{}\<[14]%
+\>[14]{}\mathrel{=}\Varid{read}\mathbin{\$}\Varid{args}\mathbin{!!}\mathrm{2}\mathbin{::}\Conid{Int}{}\<[E]%
+\\
+\>[3]{}\hsindent{4}{}\<[7]%
+\>[7]{}\Varid{numS}{}\<[14]%
+\>[14]{}\mathrel{=}\Varid{read}\mathbin{\$}\Varid{args}\mathbin{!!}\mathrm{3}\mathbin{::}\Conid{Int}{}\<[E]%
+\\
+\>[3]{}\hsindent{4}{}\<[7]%
+\>[7]{}\Varid{seed}{}\<[14]%
+\>[14]{}\mathrel{=}\Varid{read}\mathbin{\$}\Varid{args}\mathbin{!!}\mathrm{4}\mathbin{::}\Conid{Int}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{mapM\char95 }\;(\Varid{createFile}\;\Varid{tlr}\;\Varid{tmlbs}\;\Varid{seed})\mathbin{\$}{}\<[E]%
+\\
+\>[3]{}\hsindent{2}{}\<[5]%
+\>[5]{}\Varid{zip}\;[\mskip1.5mu \mathrm{1}\mathinner{\ldotp\ldotp}\mskip1.5mu]\;(\Varid{selectSequences}\;\Varid{numS}\;\Varid{tlr}\;\Varid{tmlbs}\mathbin{\$}{}\<[E]%
+\\
+\>[5]{}\hsindent{11}{}\<[16]%
+\>[16]{}\Varid{sequences}\;\Varid{tlr}\;\Varid{tmlbs}\;\Varid{lenS}\;\Varid{seed}){}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+
+The creation of the trace and statistics files is handled like so:
+
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{7}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{17}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{27}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{28}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{createFile}\mathbin{::}\Conid{Double}\to \Conid{Double}\to \Conid{Int}\to (\Conid{Int},[\mskip1.5mu \Conid{Packet}\mskip1.5mu])\to \Conid{IO}\;(){}\<[E]%
+\\
+\>[B]{}\Varid{createFile}\;\Varid{tlr}\;\Varid{tmlbs}\;\Varid{seed}\;(\Varid{seqno},\Varid{s})\mathrel{=}\mathbf{do}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\mathbf{let}\;\Varid{outfile}{}\<[17]%
+\>[17]{}\mathrel{=}\Varid{concat}\;[\mskip1.5mu \text{\tt \char34 trace\char95 \char34}{}\<[E]%
+\\
+\>[17]{}\hsindent{10}{}\<[27]%
+\>[27]{},\Varid{show}\;\Varid{tlr}{}\<[E]%
+\\
+\>[17]{}\hsindent{10}{}\<[27]%
+\>[27]{},\text{\tt \char34 \char95 \char34}{}\<[E]%
+\\
+\>[17]{}\hsindent{10}{}\<[27]%
+\>[27]{},\Varid{show}\;\Varid{tmlbs}{}\<[E]%
+\\
+\>[17]{}\hsindent{10}{}\<[27]%
+\>[27]{},\text{\tt \char34 \char95 \char34}{}\<[E]%
+\\
+\>[17]{}\hsindent{10}{}\<[27]%
+\>[27]{},\Varid{show}\;\Varid{seed}{}\<[E]%
+\\
+\>[17]{}\hsindent{10}{}\<[27]%
+\>[27]{},\text{\tt \char34 \char95 \char34}{}\<[E]%
+\\
+\>[17]{}\hsindent{10}{}\<[27]%
+\>[27]{},\Varid{show}\;\Varid{seqno}{}\<[E]%
+\\
+\>[17]{}\hsindent{10}{}\<[27]%
+\>[27]{},\text{\tt \char34 .txt\char34}\mskip1.5mu]{}\<[E]%
+\\
+\>[3]{}\hsindent{4}{}\<[7]%
+\>[7]{}\Varid{statsfile}\mathrel{=}\Varid{concat}\;[\mskip1.5mu \text{\tt \char34 stats\char95 \char34}{}\<[E]%
+\\
+\>[7]{}\hsindent{20}{}\<[27]%
+\>[27]{},\Varid{show}\;\Varid{tlr}{}\<[E]%
+\\
+\>[7]{}\hsindent{20}{}\<[27]%
+\>[27]{},\text{\tt \char34 \char95 \char34}{}\<[E]%
+\\
+\>[7]{}\hsindent{20}{}\<[27]%
+\>[27]{},\Varid{show}\;\Varid{tmlbs}{}\<[E]%
+\\
+\>[7]{}\hsindent{20}{}\<[27]%
+\>[27]{},\text{\tt \char34 \char95 \char34}{}\<[E]%
+\\
+\>[7]{}\hsindent{20}{}\<[27]%
+\>[27]{},\Varid{show}\;\Varid{seed}{}\<[E]%
+\\
+\>[27]{}\hsindent{1}{}\<[28]%
+\>[28]{},\text{\tt \char34 .txt\char34}\mskip1.5mu]{}\<[E]%
+\\
+\>[3]{}\hsindent{4}{}\<[7]%
+\>[7]{}\Varid{stats}{}\<[17]%
+\>[17]{}\mathrel{=}\Varid{concat}\;[\mskip1.5mu \text{\tt \char34 Sequence~\char34}{}\<[E]%
+\\
+\>[17]{}\hsindent{10}{}\<[27]%
+\>[27]{},\Varid{show}\;\Varid{seqno}{}\<[E]%
+\\
+\>[17]{}\hsindent{10}{}\<[27]%
+\>[27]{},\text{\tt \char34 ~lr~=~\char34}{}\<[E]%
+\\
+\>[17]{}\hsindent{10}{}\<[27]%
+\>[27]{},\Varid{show}\mathbin{\$}\Varid{lr}\;\Varid{s}{}\<[E]%
+\\
+\>[17]{}\hsindent{10}{}\<[27]%
+\>[27]{},\text{\tt \char34 ,~mlbs~=~\char34}{}\<[E]%
+\\
+\>[17]{}\hsindent{10}{}\<[27]%
+\>[27]{},\Varid{show}\mathbin{\$}\Varid{mlbs}\;\Varid{s}{}\<[E]%
+\\
+\>[17]{}\hsindent{10}{}\<[27]%
+\>[27]{},\text{\tt \char34 \char92 n\char34}\mskip1.5mu]{}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{writeFile}\;\Varid{outfile}\mathbin{\$}\Varid{concat}\mathbin{\$}\Varid{map}\;(\Varid{show})\;\Varid{s}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{appendFile}\;\Varid{statsfile}\;\Varid{stats}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+
+
+
+\end{document}
