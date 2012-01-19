@@ -1,7 +1,37 @@
 \documentclass{article}
+\usepackage{color}
 %include polycode.fmt
 \usepackage{graphicx}
-%\usepackage{listings}
+%include gilbert.fmt
+
+\definecolor{datatype}{RGB}{180,50,217}
+\definecolor{constructor}{RGB}{145,55,200}
+\definecolor{class}{RGB}{197,11,16}
+\definecolor{fieldname}{RGB}{0,0,162}
+\definecolor{prelude}{RGB}{64,80,117}
+\definecolor{numeral}{RGB}{0,150,50}
+\definecolor{infixoperator}{RGB}{42,0,217}
+\definecolor{keyword}{RGB}{229,120,0}
+\definecolor{special1}{RGB}{159,138,0}
+\definecolor{string}{RGB}{150, 30, 30}
+\definecolor{char}{RGB}{3, 106, 7}
+\definecolor{constant}{RGB}{38, 139, 210}
+\definecolor{function}{RGB}{50, 0, 250}
+
+\newcommand{\lhsCHsyntax}[1]{\color{syntax}{{#1}}}
+\newcommand{\lhsCHfunction}[1]{\color{function}{{#1}}}
+\newcommand{\lhsCHinfixoperator}[1]{\color{infixoperator}{{#1}}}
+\newcommand{\lhsCHprelude}[1]{\color{prelude}{\mathbf{#1}}}
+\newcommand{\lhsCHkeyword}[1]{\color{keyword}{\textbf{#1}}}
+\newcommand{\lhsCHconstructor}[1]{\color{constructor}{\textbf{#1}}}
+\newcommand{\lhsCHtype}[1]{\color{datatype}{{#1}}}
+\newcommand{\lhsCHclass}[1]{\color{class}{{#1}}}
+\newcommand{\lhsCHconstant}[1]{\color{constant}{{#1}}}
+
+%subst char a    = "\color{char}\text{\tt ''" a "''}"
+%subst string a  = "\color{string}\text{\tt \char34 " a "\char34}"
+%subst numeral a = "\color{numeral}{ " a " }"
+
 
 %{-
 %
@@ -101,9 +131,9 @@ We then have:
 
 checkSequence :: Double -> Double -> [Packet] -> Bool
 checkSequence tlr tmlbs s 
-              | tlr > 0   = (abs $ tlr - lr s) <= 0.05 * tlr && 
-                            (abs $ tmlbs - mlbs s) <= 0.1
-              | otherwise = lr s == 0
+              | tlr > 0     = (abs $ tlr - lr s) <= 0.05 * tlr && 
+                              (abs $ tmlbs - mlbs s) <= 0.1
+              | otherwise   = lr s == 0
 
 \end{code}
 
@@ -112,8 +142,8 @@ packets and dividing over the sequence length.
 
 \begin{code}
 
-lr xs = (fromIntegral . length . filter (== P_LOST) $ xs ) / 
-        (fromIntegral . length $ xs) 
+lr xs  =  (fromIntegral . length . filter (== P_LOST) $ xs ) / 
+          (fromIntegral . length $ xs) 
 
 \end{code}
 
@@ -126,12 +156,14 @@ loss burst size as one.
 \begin{code}
 
 mlbs xs 
-     | length l_events > 0 = (fromIntegral . sum . map length $ l_events) / 
-                             (fromIntegral . length $ l_events)
-     | otherwise           = 1
+     |  length l_events > 0  =  (fromIntegral . sum . map length $ 
+                                l_events) / (fromIntegral . length $ 
+                                l_events)
+     |  otherwise            =  1
   where
-    l_events = (filter (\e -> head e == P_LOST)) . 
-               (groupBy (\x y -> x==y && y==P_LOST)) $ xs
+    l_events  =  (filter (\e -> head e == P_LOST)) . 
+                 (groupBy (\x y -> x==y && y==P_LOST)) $ 
+                 xs
                
 \end{code}
 
@@ -171,9 +203,10 @@ We can then write
 
 \begin{code}
 
-selectSequences :: Int -> Double -> Double -> [[Packet]] -> [[Packet]]
-selectSequences k tlr tmlbs s = take k $ 
-                                filter (checkSequence tlr tmlbs) s
+selectSequences ::  Int -> Double -> Double -> [[Packet]] -> 
+                    [[Packet]]
+selectSequences k tlr tmlbs s   =  take k $ 
+                                   filter (checkSequence tlr tmlbs) s
 
 \end{code}
 
@@ -213,20 +246,20 @@ createSequence tlr tmlbs k s = unfoldr fgen (p, q, P_OK, probs)
  
  \begin{code}
         
-fgen :: (Double, Double, Packet , [Double]) -> 
-        Maybe (Packet, (Double, Double, Packet, [Double]))
+fgen ::  (Double, Double, Packet , [Double]) -> 
+         Maybe (Packet, (Double, Double, Packet, [Double]))
         
         
-fgen (_, _, _, []) = Nothing
-fgen (p, q, current, probs) = Just (next, (p, q, next, tail probs))
+fgen  (_,  _,  _,        [])           =  Nothing
+fgen  (p,  q,  current,  probs)        =  Just (next, (p, q, next, tail probs))
   where 
     next = case current of 
-      P_OK   -> if (p <= head probs ) 
-                then P_OK 
-                else P_LOST
-      P_LOST -> if (q <= head probs) 
-                then P_LOST 
-                else P_OK
+      P_OK    ->  if (p <= head probs) 
+                    then P_OK     
+                    else P_LOST
+      P_LOST  ->  if (q <= head probs) 
+                    then P_LOST 
+                    else P_OK
                                
 \end{code}
 
@@ -239,7 +272,8 @@ as some combinations of target values and sequence length are not feasible.
 \begin{code}
 
 sequences :: Double -> Double -> Int -> Int -> [[Packet]]
-sequences tlr tmlbs k s = map (createSequence tlr tmlbs k) $ seeds s
+sequences tlr tmlbs k s  =  map (createSequence tlr tmlbs k) $ 
+                            seeds s
 
 \end{code}
 
@@ -255,14 +289,14 @@ sizes of the sequences generated, for validation purposes.
 
 main = do
   args <- getArgs
-  let tlr    = read $ args!!0::Double
-      tmlbs  = read $ args!!1::Double
-      lenS   = read $ args!!2::Int
-      numS   = read $ args!!3::Int
-      seed   = read $ args!!4::Int
-  mapM_ (createFile tlr tmlbs seed) $ 
-    zip [1..] (selectSequences numS tlr tmlbs $ 
-               sequences tlr tmlbs lenS seed)
+  let tlr    =  read $ args!!0::Double
+      tmlbs  =  read $ args!!1::Double
+      lenS   =  read $ args!!2::Int
+      numS   =  read $ args!!3::Int
+      seed   =  read $ args!!4::Int
+  mapM_  (createFile tlr tmlbs seed) $ 
+         zip [1..]  (  selectSequences numS tlr tmlbs $ 
+                       sequences tlr tmlbs lenS seed)
   
 \end{code}
 
@@ -270,7 +304,9 @@ The creation of the trace and statistics files is handled like so:
 
 \begin{code}  
 
-createFile :: Double -> Double -> Int -> (Int, [Packet]) -> IO()
+createFile ::  Double -> Double -> Int -> 
+               (Int, [Packet]) -> IO()
+
 createFile tlr tmlbs seed (seqno, s) = do 
   let outfile   = concat ["trace_"
                           , show tlr

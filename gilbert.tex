@@ -1,4 +1,5 @@
 \documentclass{article}
+\usepackage{color}
 %% ODER: format ==         = "\mathrel{==}"
 %% ODER: format /=         = "\neq "
 %
@@ -259,7 +260,32 @@
 \EndFmtInput
 %
 \usepackage{graphicx}
-%\usepackage{listings}
+
+\definecolor{datatype}{RGB}{180,50,217}
+\definecolor{constructor}{RGB}{145,55,200}
+\definecolor{class}{RGB}{197,11,16}
+\definecolor{fieldname}{RGB}{0,0,162}
+\definecolor{prelude}{RGB}{64,80,117}
+\definecolor{numeral}{RGB}{0,150,50}
+\definecolor{infixoperator}{RGB}{42,0,217}
+\definecolor{keyword}{RGB}{229,120,0}
+\definecolor{special1}{RGB}{159,138,0}
+\definecolor{string}{RGB}{150, 30, 30}
+\definecolor{char}{RGB}{3, 106, 7}
+\definecolor{constant}{RGB}{38, 139, 210}
+\definecolor{function}{RGB}{50, 0, 250}
+
+\newcommand{\lhsCHsyntax}[1]{\color{syntax}{{#1}}}
+\newcommand{\lhsCHfunction}[1]{\color{function}{{#1}}}
+\newcommand{\lhsCHinfixoperator}[1]{\color{infixoperator}{{#1}}}
+\newcommand{\lhsCHprelude}[1]{\color{prelude}{\mathbf{#1}}}
+\newcommand{\lhsCHkeyword}[1]{\color{keyword}{\textbf{#1}}}
+\newcommand{\lhsCHconstructor}[1]{\color{constructor}{\textbf{#1}}}
+\newcommand{\lhsCHtype}[1]{\color{datatype}{{#1}}}
+\newcommand{\lhsCHclass}[1]{\color{class}{{#1}}}
+\newcommand{\lhsCHconstant}[1]{\color{constant}{{#1}}}
+
+
 
 %{-
 %
@@ -323,15 +349,15 @@ follows:
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{3}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
-\>[B]{}\mathbf{data}\;\Conid{Packet}\mathrel{=}\Conid{P\char95 OK}\mid \Conid{P\char95 LOST}\;\mathbf{deriving}\;\Conid{Eq}{}\<[E]%
+\>[B]{}\mathbf{data}\; {\lhsCHtype{Packet}}\mathrel{=} {\lhsCHconstructor{P$_{\textbf{OK}}$}}\mid  {\lhsCHconstructor{P$_{\textbf{LOST}}$}}\;\mathbf{deriving}\; {\lhsCHclass{Eq}}{}\<[E]%
 \\
-\>[B]{}\mathbf{instance}\;\Conid{Show}\;\Conid{Packet}\;\mathbf{where}{}\<[E]%
-\\
-\>[B]{}\hsindent{3}{}\<[3]%
-\>[3]{}\Varid{show}\;\Conid{P\char95 OK}\mathrel{=}\text{\tt \char34 0\char34}{}\<[E]%
+\>[B]{}\mathbf{instance}\;\Conid{Show}\; {\lhsCHtype{Packet}}\;\mathbf{where}{}\<[E]%
 \\
 \>[B]{}\hsindent{3}{}\<[3]%
-\>[3]{}\Varid{show}\;\Conid{P\char95 LOST}\mathrel{=}\text{\tt \char34 1\char34}{}\<[E]%
+\>[3]{} {\lhsCHfunction{show}}\; {\lhsCHconstructor{P$_{\textbf{OK}}$}}\mathrel{=}\color{string}\text{\tt \char34 0\char34}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{} {\lhsCHfunction{show}}\; {\lhsCHconstructor{P$_{\textbf{LOST}}$}}\mathrel{=}\color{string}\text{\tt \char34 1\char34}{}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
 
@@ -369,22 +395,23 @@ We then have:
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{15}{@{}>{\hspre}l<{\hspost}@{}}%
-\column{27}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{29}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{31}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
-\>[B]{}\Varid{checkSequence}\mathbin{::}\Conid{Double}\to \Conid{Double}\to [\mskip1.5mu \Conid{Packet}\mskip1.5mu]\to \Conid{Bool}{}\<[E]%
+\>[B]{} {\lhsCHfunction{checkSequence}}\mathbin{::} {\lhsCHtype{Double}}\to  {\lhsCHtype{Double}}\to [\mskip1.5mu  {\lhsCHtype{Packet}}\mskip1.5mu]\to  {\lhsCHtype{Bool}}{}\<[E]%
 \\
-\>[B]{}\Varid{checkSequence}\;\Varid{tlr}\;\Varid{tmlbs}\;\Varid{s}{}\<[E]%
-\\
-\>[B]{}\hsindent{15}{}\<[15]%
-\>[15]{}\mid \Varid{tlr}\mathbin{>}\mathrm{0}{}\<[27]%
-\>[27]{}\mathrel{=}(\Varid{abs}\mathbin{\$}\Varid{tlr}\mathbin{-}\Varid{lr}\;\Varid{s})\leq \mathrm{0.05}\mathbin{*}\Varid{tlr}\mathrel{\wedge}{}\<[E]%
-\\
-\>[27]{}\hsindent{2}{}\<[29]%
-\>[29]{}(\Varid{abs}\mathbin{\$}\Varid{tmlbs}\mathbin{-}\Varid{mlbs}\;\Varid{s})\leq \mathrm{0.1}{}\<[E]%
+\>[B]{} {\lhsCHfunction{checkSequence}}\;\Varid{tlr}\;\Varid{tmlbs}\;\Varid{s}{}\<[E]%
 \\
 \>[B]{}\hsindent{15}{}\<[15]%
-\>[15]{}\mid \Varid{otherwise}\mathrel{=}\Varid{lr}\;\Varid{s}\equiv \mathrm{0}{}\<[E]%
+\>[15]{}\mid \Varid{tlr} {\lhsCHinfixoperator{\ \mathbin{\textgreater}\ }}\color{numeral}{ 0 }{}\<[29]%
+\>[29]{}\mathrel{=}(\Varid{abs} {\lhsCHinfixoperator{\ \mathbin{\ \mathbin{\$}\ }\ }}\Varid{tlr} {\lhsCHinfixoperator{\ \mathbin{-}\ }} {\lhsCHfunction{lr}}\;\Varid{s}) {\lhsCHinfixoperator{\ \mathbin{\ \leq\ }\ }}\color{numeral}{ 0.05 } {\lhsCHinfixoperator{\ \mathbin{*}\ }}\Varid{tlr} {\lhsCHinfixoperator{\ \mathbin{\ \mathrel{\wedge}\ }\ }}{}\<[E]%
+\\
+\>[29]{}\hsindent{2}{}\<[31]%
+\>[31]{}(\Varid{abs} {\lhsCHinfixoperator{\ \mathbin{\ \mathbin{\$}\ }\ }}\Varid{tmlbs} {\lhsCHinfixoperator{\ \mathbin{-}\ }} {\lhsCHfunction{mlbs}}\;\Varid{s}) {\lhsCHinfixoperator{\ \mathbin{\ \leq\ }\ }}\color{numeral}{ 0.1 }{}\<[E]%
+\\
+\>[B]{}\hsindent{15}{}\<[15]%
+\>[15]{}\mid \Varid{otherwise}{}\<[29]%
+\>[29]{}\mathrel{=} {\lhsCHfunction{lr}}\;\Varid{s} {\lhsCHinfixoperator{\ \mathbin{\ \equiv\ }\ }}\color{numeral}{ 0 }{}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
 
@@ -393,12 +420,15 @@ packets and dividing over the sequence length.
 
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
-\column{9}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{8}{@{}>{\hspre}c<{\hspost}@{}}%
+\column{8E}{@{}l@{}}%
+\column{11}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
-\>[B]{}\Varid{lr}\;\Varid{xs}\mathrel{=}(\Varid{fromIntegral}\mathbin{\circ}\Varid{length}\mathbin{\circ}\Varid{filter}\;(\equiv \Conid{P\char95 LOST})\mathbin{\$}\Varid{xs})\mathbin{/}{}\<[E]%
+\>[B]{} {\lhsCHfunction{lr}}\;\Varid{xs}{}\<[8]%
+\>[8]{}\mathrel{=}{}\<[8E]%
+\>[11]{}(\Varid{fromIntegral} {\lhsCHinfixoperator{\ \mathbin{.}\ }} {\lhsCHfunction{length}} {\lhsCHinfixoperator{\ \mathbin{.}\ }} {\lhsCHfunction{filter}}\;( {\lhsCHinfixoperator{\ \mathbin{\ \equiv\ }\ }} {\lhsCHconstructor{P$_{\textbf{LOST}}$}}) {\lhsCHinfixoperator{\ \mathbin{\ \mathbin{\$}\ }\ }}\Varid{xs}) {\lhsCHinfixoperator{\ \mathbin{/}\ }}{}\<[E]%
 \\
-\>[B]{}\hsindent{9}{}\<[9]%
-\>[9]{}(\Varid{fromIntegral}\mathbin{\circ}\Varid{length}\mathbin{\$}\Varid{xs}){}\<[E]%
+\>[11]{}(\Varid{fromIntegral} {\lhsCHinfixoperator{\ \mathbin{.}\ }} {\lhsCHfunction{length}} {\lhsCHinfixoperator{\ \mathbin{\ \mathbin{\$}\ }\ }}\Varid{xs}){}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
 
@@ -412,31 +442,45 @@ loss burst size as one.
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{3}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{5}{@{}>{\hspre}l<{\hspost}@{}}%
-\column{6}{@{}>{\hspre}l<{\hspost}@{}}%
-\column{16}{@{}>{\hspre}l<{\hspost}@{}}%
-\column{28}{@{}>{\hspre}l<{\hspost}@{}}%
-\column{30}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{6}{@{}>{\hspre}c<{\hspost}@{}}%
+\column{6E}{@{}l@{}}%
+\column{9}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{15}{@{}>{\hspre}c<{\hspost}@{}}%
+\column{15E}{@{}l@{}}%
+\column{18}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{30}{@{}>{\hspre}c<{\hspost}@{}}%
+\column{30E}{@{}l@{}}%
+\column{33}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
-\>[B]{}\Varid{mlbs}\;\Varid{xs}{}\<[E]%
+\>[B]{} {\lhsCHfunction{mlbs}}\;\Varid{xs}{}\<[E]%
 \\
 \>[B]{}\hsindent{6}{}\<[6]%
-\>[6]{}\mid \Varid{length}\;\Varid{l\char95 events}\mathbin{>}\mathrm{0}\mathrel{=}(\Varid{fromIntegral}\mathbin{\circ}\Varid{sum}\mathbin{\circ}\Varid{map}\;\Varid{length}\mathbin{\$}\Varid{l\char95 events})\mathbin{/}{}\<[E]%
+\>[6]{}\mid {}\<[6E]%
+\>[9]{} {\lhsCHfunction{length}}\;\Varid{l\char95 events} {\lhsCHinfixoperator{\ \mathbin{\textgreater}\ }}\color{numeral}{ 0 }{}\<[30]%
+\>[30]{}\mathrel{=}{}\<[30E]%
+\>[33]{}(\Varid{fromIntegral} {\lhsCHinfixoperator{\ \mathbin{.}\ }}\Varid{sum} {\lhsCHinfixoperator{\ \mathbin{.}\ }} {\lhsCHfunction{map}}\; {\lhsCHfunction{length}} {\lhsCHinfixoperator{\ \mathbin{\ \mathbin{\$}\ }\ }}{}\<[E]%
 \\
-\>[6]{}\hsindent{24}{}\<[30]%
-\>[30]{}(\Varid{fromIntegral}\mathbin{\circ}\Varid{length}\mathbin{\$}\Varid{l\char95 events}){}\<[E]%
+\>[33]{}\Varid{l\char95 events}) {\lhsCHinfixoperator{\ \mathbin{/}\ }}(\Varid{fromIntegral} {\lhsCHinfixoperator{\ \mathbin{.}\ }} {\lhsCHfunction{length}} {\lhsCHinfixoperator{\ \mathbin{\ \mathbin{\$}\ }\ }}{}\<[E]%
+\\
+\>[33]{}\Varid{l\char95 events}){}\<[E]%
 \\
 \>[B]{}\hsindent{6}{}\<[6]%
-\>[6]{}\mid \Varid{otherwise}{}\<[28]%
-\>[28]{}\mathrel{=}\mathrm{1}{}\<[E]%
+\>[6]{}\mid {}\<[6E]%
+\>[9]{}\Varid{otherwise}{}\<[30]%
+\>[30]{}\mathrel{=}{}\<[30E]%
+\>[33]{}\color{numeral}{ 1 }{}\<[E]%
 \\
 \>[B]{}\hsindent{3}{}\<[3]%
 \>[3]{}\mathbf{where}{}\<[E]%
 \\
 \>[3]{}\hsindent{2}{}\<[5]%
-\>[5]{}\Varid{l\char95 events}\mathrel{=}(\Varid{filter}\;(\lambda \Varid{e}\to \Varid{head}\;\Varid{e}\equiv \Conid{P\char95 LOST}))\mathbin{\circ}{}\<[E]%
+\>[5]{}\Varid{l\char95 events}{}\<[15]%
+\>[15]{}\mathrel{=}{}\<[15E]%
+\>[18]{}( {\lhsCHfunction{filter}}\;(\lambda \Varid{e}\to  {\lhsCHfunction{head}}\;\Varid{e} {\lhsCHinfixoperator{\ \mathbin{\ \equiv\ }\ }} {\lhsCHconstructor{P$_{\textbf{LOST}}$}})) {\lhsCHinfixoperator{\ \mathbin{.}\ }}{}\<[E]%
 \\
-\>[5]{}\hsindent{11}{}\<[16]%
-\>[16]{}(\Varid{groupBy}\;(\lambda \Varid{x}\;\Varid{y}\to \Varid{x}\equiv \Varid{y}\mathrel{\wedge}\Varid{y}\equiv \Conid{P\char95 LOST}))\mathbin{\$}\Varid{xs}{}\<[E]%
+\>[18]{}( {\lhsCHfunction{groupBy}}\;(\lambda \Varid{x}\;\Varid{y}\to \Varid{x} {\lhsCHinfixoperator{\ \mathbin{\ \equiv\ }\ }}\Varid{y} {\lhsCHinfixoperator{\ \mathbin{\ \mathrel{\wedge}\ }\ }}\Varid{y} {\lhsCHinfixoperator{\ \mathbin{\ \equiv\ }\ }} {\lhsCHconstructor{P$_{\textbf{LOST}}$}})) {\lhsCHinfixoperator{\ \mathbin{\ \mathbin{\$}\ }\ }}{}\<[E]%
+\\
+\>[18]{}\Varid{xs}{}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
 
@@ -476,14 +520,21 @@ We can then write
 
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
-\column{33}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{21}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{33}{@{}>{\hspre}c<{\hspost}@{}}%
+\column{33E}{@{}l@{}}%
+\column{36}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
-\>[B]{}\Varid{selectSequences}\mathbin{::}\Conid{Int}\to \Conid{Double}\to \Conid{Double}\to [\mskip1.5mu [\mskip1.5mu \Conid{Packet}\mskip1.5mu]\mskip1.5mu]\to [\mskip1.5mu [\mskip1.5mu \Conid{Packet}\mskip1.5mu]\mskip1.5mu]{}\<[E]%
+\>[B]{} {\lhsCHfunction{selectSequences}}\mathbin{::}{}\<[21]%
+\>[21]{} {\lhsCHtype{Int}}\to  {\lhsCHtype{Double}}\to  {\lhsCHtype{Double}}\to [\mskip1.5mu [\mskip1.5mu  {\lhsCHtype{Packet}}\mskip1.5mu]\mskip1.5mu]\to {}\<[E]%
 \\
-\>[B]{}\Varid{selectSequences}\;\Varid{k}\;\Varid{tlr}\;\Varid{tmlbs}\;\Varid{s}\mathrel{=}\Varid{take}\;\Varid{k}\mathbin{\$}{}\<[E]%
+\>[21]{}[\mskip1.5mu [\mskip1.5mu  {\lhsCHtype{Packet}}\mskip1.5mu]\mskip1.5mu]{}\<[E]%
 \\
-\>[B]{}\hsindent{33}{}\<[33]%
-\>[33]{}\Varid{filter}\;(\Varid{checkSequence}\;\Varid{tlr}\;\Varid{tmlbs})\;\Varid{s}{}\<[E]%
+\>[B]{} {\lhsCHfunction{selectSequences}}\;\Varid{k}\;\Varid{tlr}\;\Varid{tmlbs}\;\Varid{s}{}\<[33]%
+\>[33]{}\mathrel{=}{}\<[33E]%
+\>[36]{} {\lhsCHfunction{take}}\;\Varid{k} {\lhsCHinfixoperator{\ \mathbin{\ \mathbin{\$}\ }\ }}{}\<[E]%
+\\
+\>[36]{} {\lhsCHfunction{filter}}\;( {\lhsCHfunction{checkSequence}}\;\Varid{tlr}\;\Varid{tmlbs})\;\Varid{s}{}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
 
@@ -497,7 +548,7 @@ of the code pure.
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
-\>[B]{}\Varid{seeds}\;\Varid{s}\mathrel{=}(\Varid{randoms}\mathbin{\$}\Varid{mkStdGen}\;\Varid{s})\mathbin{::}[\mskip1.5mu \Conid{Int}\mskip1.5mu]{}\<[E]%
+\>[B]{} {\lhsCHfunction{seeds}}\;\Varid{s}\mathrel{=}(\Varid{randoms} {\lhsCHinfixoperator{\ \mathbin{\ \mathbin{\$}\ }\ }} {\lhsCHfunction{mkStdGen}}\;\Varid{s})\mathbin{::}[\mskip1.5mu  {\lhsCHtype{Int}}\mskip1.5mu]{}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
 
@@ -516,33 +567,33 @@ pseudo--random number generator. We always start from a loss--free state.
 \column{11}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{23}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
-\>[B]{}\Varid{createSequence}\mathbin{::}\Conid{Double}\to \Conid{Double}\to \Conid{Int}\to \Conid{Int}\to [\mskip1.5mu \Conid{Packet}\mskip1.5mu]{}\<[E]%
+\>[B]{} {\lhsCHfunction{createSequence}}\mathbin{::} {\lhsCHtype{Double}}\to  {\lhsCHtype{Double}}\to  {\lhsCHtype{Int}}\to  {\lhsCHtype{Int}}\to [\mskip1.5mu  {\lhsCHtype{Packet}}\mskip1.5mu]{}\<[E]%
 \\
-\>[B]{}\Varid{createSequence}\;\Varid{tlr}\;\Varid{tmlbs}\;\Varid{k}\;\Varid{s}\mathrel{=}\Varid{unfoldr}\;\Varid{fgen}\;(\Varid{p},\Varid{q},\Conid{P\char95 OK},\Varid{probs}){}\<[E]%
+\>[B]{} {\lhsCHfunction{createSequence}}\;\Varid{tlr}\;\Varid{tmlbs}\;\Varid{k}\;\Varid{s}\mathrel{=} {\lhsCHfunction{unfoldr}}\;\Varid{fgen}\;(\Varid{p},\Varid{q}, {\lhsCHconstructor{P$_{\textbf{OK}}$}},\Varid{probs}){}\<[E]%
 \\
 \>[B]{}\hsindent{3}{}\<[3]%
 \>[3]{}\mathbf{where}{}\<[E]%
 \\
 \>[3]{}\hsindent{2}{}\<[5]%
-\>[5]{}\Varid{probs}\mathrel{=}\Varid{take}\;\Varid{k}\mathbin{\$}{}\<[23]%
-\>[23]{}(\Varid{randoms}\mathbin{\$}\Varid{mkStdGen}\;\Varid{s})\mathbin{::}[\mskip1.5mu \Conid{Double}\mskip1.5mu]{}\<[E]%
+\>[5]{}\Varid{probs}\mathrel{=} {\lhsCHfunction{take}}\;\Varid{k} {\lhsCHinfixoperator{\ \mathbin{\ \mathbin{\$}\ }\ }}{}\<[23]%
+\>[23]{}(\Varid{randoms} {\lhsCHinfixoperator{\ \mathbin{\ \mathbin{\$}\ }\ }} {\lhsCHfunction{mkStdGen}}\;\Varid{s})\mathbin{::}[\mskip1.5mu  {\lhsCHtype{Double}}\mskip1.5mu]{}\<[E]%
 \\
 \>[3]{}\hsindent{2}{}\<[5]%
 \>[5]{}\Varid{p}{}\<[11]%
-\>[11]{}\mathrel{=}(\Varid{tlr}\mathbin{/}(\mathrm{1}\mathbin{-}\Varid{tlr}))\mathbin{/}\Varid{mbs}{}\<[E]%
+\>[11]{}\mathrel{=}(\Varid{tlr} {\lhsCHinfixoperator{\ \mathbin{/}\ }}(\color{numeral}{ 1 } {\lhsCHinfixoperator{\ \mathbin{-}\ }}\Varid{tlr})) {\lhsCHinfixoperator{\ \mathbin{/}\ }}\Varid{mbs}{}\<[E]%
 \\
 \>[3]{}\hsindent{2}{}\<[5]%
 \>[5]{}\Varid{q}{}\<[11]%
-\>[11]{}\mathrel{=}\mathrm{1}\mathbin{/}\Varid{mbs}{}\<[E]%
+\>[11]{}\mathrel{=}\color{numeral}{ 1 } {\lhsCHinfixoperator{\ \mathbin{/}\ }}\Varid{mbs}{}\<[E]%
 \\
 \>[3]{}\hsindent{2}{}\<[5]%
 \>[5]{}\Varid{mbs}{}\<[E]%
 \\
 \>[5]{}\hsindent{3}{}\<[8]%
-\>[8]{}\mid \Varid{tmlbs}\mathbin{>}\mathrm{0}\mathrel{=}\Varid{tmlbs}{}\<[E]%
+\>[8]{}\mid \Varid{tmlbs} {\lhsCHinfixoperator{\ \mathbin{\textgreater}\ }}\color{numeral}{ 0 }\mathrel{=}\Varid{tmlbs}{}\<[E]%
 \\
 \>[5]{}\hsindent{3}{}\<[8]%
-\>[8]{}\mid \Varid{otherwise}\mathrel{=}\mathrm{1}{}\<[E]%
+\>[8]{}\mid \Varid{otherwise}\mathrel{=}\color{numeral}{ 1 }{}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
  
@@ -551,18 +602,38 @@ pseudo--random number generator. We always start from a loss--free state.
 \column{3}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{5}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{7}{@{}>{\hspre}l<{\hspost}@{}}%
-\column{9}{@{}>{\hspre}l<{\hspost}@{}}%
-\column{14}{@{}>{\hspre}l<{\hspost}@{}}%
-\column{17}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{10}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{12}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{15}{@{}>{\hspre}c<{\hspost}@{}}%
+\column{15E}{@{}l@{}}%
+\column{16}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{19}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{21}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{26}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{40}{@{}>{\hspre}c<{\hspost}@{}}%
+\column{40E}{@{}l@{}}%
+\column{43}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
-\>[B]{}\Varid{fgen}\mathbin{::}(\Conid{Double},\Conid{Double},\Conid{Packet},[\mskip1.5mu \Conid{Double}\mskip1.5mu])\to {}\<[E]%
+\>[B]{}\Varid{fgen}\mathbin{::}{}\<[10]%
+\>[10]{}( {\lhsCHtype{Double}}, {\lhsCHtype{Double}}, {\lhsCHtype{Packet}},[\mskip1.5mu  {\lhsCHtype{Double}}\mskip1.5mu])\to {}\<[E]%
 \\
-\>[B]{}\hsindent{9}{}\<[9]%
-\>[9]{}\Conid{Maybe}\;(\Conid{Packet},(\Conid{Double},\Conid{Double},\Conid{Packet},[\mskip1.5mu \Conid{Double}\mskip1.5mu])){}\<[E]%
+\>[10]{}\Conid{Maybe}\;( {\lhsCHtype{Packet}},( {\lhsCHtype{Double}}, {\lhsCHtype{Double}}, {\lhsCHtype{Packet}},[\mskip1.5mu  {\lhsCHtype{Double}}\mskip1.5mu])){}\<[E]%
 \\[\blanklineskip]%
-\>[B]{}\Varid{fgen}\;(\anonymous ,\anonymous ,\anonymous ,[\mskip1.5mu \mskip1.5mu])\mathrel{=}\Conid{Nothing}{}\<[E]%
+\>[B]{}\Varid{fgen}\;{}\<[7]%
+\>[7]{}(\anonymous ,{}\<[12]%
+\>[12]{}\anonymous ,{}\<[16]%
+\>[16]{}\anonymous ,{}\<[26]%
+\>[26]{}[\mskip1.5mu \mskip1.5mu]){}\<[40]%
+\>[40]{}\mathrel{=}{}\<[40E]%
+\>[43]{}\Conid{Nothing}{}\<[E]%
 \\
-\>[B]{}\Varid{fgen}\;(\Varid{p},\Varid{q},\Varid{current},\Varid{probs})\mathrel{=}\Conid{Just}\;(\Varid{next},(\Varid{p},\Varid{q},\Varid{next},\Varid{tail}\;\Varid{probs})){}\<[E]%
+\>[B]{}\Varid{fgen}\;{}\<[7]%
+\>[7]{}(\Varid{p},{}\<[12]%
+\>[12]{}\Varid{q},{}\<[16]%
+\>[16]{}\Varid{current},{}\<[26]%
+\>[26]{}\Varid{probs}){}\<[40]%
+\>[40]{}\mathrel{=}{}\<[40E]%
+\>[43]{}\Conid{Just}\;(\Varid{next},(\Varid{p},\Varid{q},\Varid{next},\Varid{tail}\;\Varid{probs})){}\<[E]%
 \\
 \>[B]{}\hsindent{3}{}\<[3]%
 \>[3]{}\mathbf{where}{}\<[E]%
@@ -571,23 +642,26 @@ pseudo--random number generator. We always start from a loss--free state.
 \>[5]{}\Varid{next}\mathrel{=}\mathbf{case}\;\Varid{current}\;\mathbf{of}{}\<[E]%
 \\
 \>[5]{}\hsindent{2}{}\<[7]%
-\>[7]{}\Conid{P\char95 OK}{}\<[14]%
-\>[14]{}\to \mathbf{if}\;(\Varid{p}\leq \Varid{head}\;\Varid{probs}){}\<[E]%
+\>[7]{} {\lhsCHconstructor{P$_{\textbf{OK}}$}}{}\<[15]%
+\>[15]{}\to {}\<[15E]%
+\>[19]{}\mathbf{if}\;(\Varid{p} {\lhsCHinfixoperator{\ \mathbin{\ \leq\ }\ }} {\lhsCHfunction{head}}\;\Varid{probs}){}\<[E]%
 \\
-\>[14]{}\hsindent{3}{}\<[17]%
-\>[17]{}\mathbf{then}\;\Conid{P\char95 OK}{}\<[E]%
+\>[19]{}\hsindent{2}{}\<[21]%
+\>[21]{}\mathbf{then}\; {\lhsCHconstructor{P$_{\textbf{OK}}$}}{}\<[E]%
 \\
-\>[14]{}\hsindent{3}{}\<[17]%
-\>[17]{}\mathbf{else}\;\Conid{P\char95 LOST}{}\<[E]%
+\>[19]{}\hsindent{2}{}\<[21]%
+\>[21]{}\mathbf{else}\; {\lhsCHconstructor{P$_{\textbf{LOST}}$}}{}\<[E]%
 \\
 \>[5]{}\hsindent{2}{}\<[7]%
-\>[7]{}\Conid{P\char95 LOST}\to \mathbf{if}\;(\Varid{q}\leq \Varid{head}\;\Varid{probs}){}\<[E]%
+\>[7]{} {\lhsCHconstructor{P$_{\textbf{LOST}}$}}{}\<[15]%
+\>[15]{}\to {}\<[15E]%
+\>[19]{}\mathbf{if}\;(\Varid{q} {\lhsCHinfixoperator{\ \mathbin{\ \leq\ }\ }} {\lhsCHfunction{head}}\;\Varid{probs}){}\<[E]%
 \\
-\>[7]{}\hsindent{10}{}\<[17]%
-\>[17]{}\mathbf{then}\;\Conid{P\char95 LOST}{}\<[E]%
+\>[19]{}\hsindent{2}{}\<[21]%
+\>[21]{}\mathbf{then}\; {\lhsCHconstructor{P$_{\textbf{LOST}}$}}{}\<[E]%
 \\
-\>[7]{}\hsindent{10}{}\<[17]%
-\>[17]{}\mathbf{else}\;\Conid{P\char95 OK}{}\<[E]%
+\>[19]{}\hsindent{2}{}\<[21]%
+\>[21]{}\mathbf{else}\; {\lhsCHconstructor{P$_{\textbf{OK}}$}}{}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
 
@@ -599,10 +673,17 @@ as some combinations of target values and sequence length are not feasible.
 
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{26}{@{}>{\hspre}c<{\hspost}@{}}%
+\column{26E}{@{}l@{}}%
+\column{29}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
-\>[B]{}\Varid{sequences}\mathbin{::}\Conid{Double}\to \Conid{Double}\to \Conid{Int}\to \Conid{Int}\to [\mskip1.5mu [\mskip1.5mu \Conid{Packet}\mskip1.5mu]\mskip1.5mu]{}\<[E]%
+\>[B]{} {\lhsCHfunction{sequences}}\mathbin{::} {\lhsCHtype{Double}}\to  {\lhsCHtype{Double}}\to  {\lhsCHtype{Int}}\to  {\lhsCHtype{Int}}\to [\mskip1.5mu [\mskip1.5mu  {\lhsCHtype{Packet}}\mskip1.5mu]\mskip1.5mu]{}\<[E]%
 \\
-\>[B]{}\Varid{sequences}\;\Varid{tlr}\;\Varid{tmlbs}\;\Varid{k}\;\Varid{s}\mathrel{=}\Varid{map}\;(\Varid{createSequence}\;\Varid{tlr}\;\Varid{tmlbs}\;\Varid{k})\mathbin{\$}\Varid{seeds}\;\Varid{s}{}\<[E]%
+\>[B]{} {\lhsCHfunction{sequences}}\;\Varid{tlr}\;\Varid{tmlbs}\;\Varid{k}\;\Varid{s}{}\<[26]%
+\>[26]{}\mathrel{=}{}\<[26E]%
+\>[29]{} {\lhsCHfunction{map}}\;( {\lhsCHfunction{createSequence}}\;\Varid{tlr}\;\Varid{tmlbs}\;\Varid{k}) {\lhsCHinfixoperator{\ \mathbin{\ \mathbin{\$}\ }\ }}{}\<[E]%
+\\
+\>[29]{} {\lhsCHfunction{seeds}}\;\Varid{s}{}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
 
@@ -617,10 +698,14 @@ sizes of the sequences generated, for validation purposes.
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{3}{@{}>{\hspre}l<{\hspost}@{}}%
-\column{5}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{7}{@{}>{\hspre}l<{\hspost}@{}}%
-\column{14}{@{}>{\hspre}l<{\hspost}@{}}%
-\column{16}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{10}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{14}{@{}>{\hspre}c<{\hspost}@{}}%
+\column{14E}{@{}l@{}}%
+\column{17}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{21}{@{}>{\hspre}c<{\hspost}@{}}%
+\column{21E}{@{}l@{}}%
+\column{24}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
 \>[B]{}\Varid{main}\mathrel{=}\mathbf{do}{}\<[E]%
 \\
@@ -629,32 +714,38 @@ sizes of the sequences generated, for validation purposes.
 \\
 \>[B]{}\hsindent{3}{}\<[3]%
 \>[3]{}\mathbf{let}\;\Varid{tlr}{}\<[14]%
-\>[14]{}\mathrel{=}\Varid{read}\mathbin{\$}\Varid{args}\mathbin{!!}\mathrm{0}\mathbin{::}\Conid{Double}{}\<[E]%
+\>[14]{}\mathrel{=}{}\<[14E]%
+\>[17]{}\Varid{read} {\lhsCHinfixoperator{\ \mathbin{\ \mathbin{\$}\ }\ }}\Varid{args} {\lhsCHinfixoperator{\ \mathbin{!!}\ }}\color{numeral}{ 0 }\mathbin{::} {\lhsCHtype{Double}}{}\<[E]%
 \\
 \>[3]{}\hsindent{4}{}\<[7]%
 \>[7]{}\Varid{tmlbs}{}\<[14]%
-\>[14]{}\mathrel{=}\Varid{read}\mathbin{\$}\Varid{args}\mathbin{!!}\mathrm{1}\mathbin{::}\Conid{Double}{}\<[E]%
+\>[14]{}\mathrel{=}{}\<[14E]%
+\>[17]{}\Varid{read} {\lhsCHinfixoperator{\ \mathbin{\ \mathbin{\$}\ }\ }}\Varid{args} {\lhsCHinfixoperator{\ \mathbin{!!}\ }}\color{numeral}{ 1 }\mathbin{::} {\lhsCHtype{Double}}{}\<[E]%
 \\
 \>[3]{}\hsindent{4}{}\<[7]%
 \>[7]{}\Varid{lenS}{}\<[14]%
-\>[14]{}\mathrel{=}\Varid{read}\mathbin{\$}\Varid{args}\mathbin{!!}\mathrm{2}\mathbin{::}\Conid{Int}{}\<[E]%
+\>[14]{}\mathrel{=}{}\<[14E]%
+\>[17]{}\Varid{read} {\lhsCHinfixoperator{\ \mathbin{\ \mathbin{\$}\ }\ }}\Varid{args} {\lhsCHinfixoperator{\ \mathbin{!!}\ }}\color{numeral}{ 2 }\mathbin{::} {\lhsCHtype{Int}}{}\<[E]%
 \\
 \>[3]{}\hsindent{4}{}\<[7]%
 \>[7]{}\Varid{numS}{}\<[14]%
-\>[14]{}\mathrel{=}\Varid{read}\mathbin{\$}\Varid{args}\mathbin{!!}\mathrm{3}\mathbin{::}\Conid{Int}{}\<[E]%
+\>[14]{}\mathrel{=}{}\<[14E]%
+\>[17]{}\Varid{read} {\lhsCHinfixoperator{\ \mathbin{\ \mathbin{\$}\ }\ }}\Varid{args} {\lhsCHinfixoperator{\ \mathbin{!!}\ }}\color{numeral}{ 3 }\mathbin{::} {\lhsCHtype{Int}}{}\<[E]%
 \\
 \>[3]{}\hsindent{4}{}\<[7]%
 \>[7]{}\Varid{seed}{}\<[14]%
-\>[14]{}\mathrel{=}\Varid{read}\mathbin{\$}\Varid{args}\mathbin{!!}\mathrm{4}\mathbin{::}\Conid{Int}{}\<[E]%
+\>[14]{}\mathrel{=}{}\<[14E]%
+\>[17]{}\Varid{read} {\lhsCHinfixoperator{\ \mathbin{\ \mathbin{\$}\ }\ }}\Varid{args} {\lhsCHinfixoperator{\ \mathbin{!!}\ }}\color{numeral}{ 4 }\mathbin{::} {\lhsCHtype{Int}}{}\<[E]%
 \\
 \>[B]{}\hsindent{3}{}\<[3]%
-\>[3]{}\Varid{mapM\char95 }\;(\Varid{createFile}\;\Varid{tlr}\;\Varid{tmlbs}\;\Varid{seed})\mathbin{\$}{}\<[E]%
+\>[3]{} {\lhsCHfunction{mapM}}\;{}\<[10]%
+\>[10]{}( {\lhsCHfunction{createFile}}\;\Varid{tlr}\;\Varid{tmlbs}\;\Varid{seed}) {\lhsCHinfixoperator{\ \mathbin{\ \mathbin{\$}\ }\ }}{}\<[E]%
 \\
-\>[3]{}\hsindent{2}{}\<[5]%
-\>[5]{}\Varid{zip}\;[\mskip1.5mu \mathrm{1}\mathinner{\ldotp\ldotp}\mskip1.5mu]\;(\Varid{selectSequences}\;\Varid{numS}\;\Varid{tlr}\;\Varid{tmlbs}\mathbin{\$}{}\<[E]%
+\>[10]{} {\lhsCHfunction{zip}}\;[\mskip1.5mu \color{numeral}{ 1 }\mathinner{\ldotp\ldotp}\mskip1.5mu]\;{}\<[21]%
+\>[21]{}({}\<[21E]%
+\>[24]{} {\lhsCHfunction{selectSequences}}\;\Varid{numS}\;\Varid{tlr}\;\Varid{tmlbs} {\lhsCHinfixoperator{\ \mathbin{\ \mathbin{\$}\ }\ }}{}\<[E]%
 \\
-\>[5]{}\hsindent{11}{}\<[16]%
-\>[16]{}\Varid{sequences}\;\Varid{tlr}\;\Varid{tmlbs}\;\Varid{lenS}\;\Varid{seed}){}\<[E]%
+\>[24]{} {\lhsCHfunction{sequences}}\;\Varid{tlr}\;\Varid{tmlbs}\;\Varid{lenS}\;\Varid{seed}){}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
 
@@ -664,87 +755,91 @@ The creation of the trace and statistics files is handled like so:
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{3}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{7}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{16}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{17}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{27}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{28}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
-\>[B]{}\Varid{createFile}\mathbin{::}\Conid{Double}\to \Conid{Double}\to \Conid{Int}\to (\Conid{Int},[\mskip1.5mu \Conid{Packet}\mskip1.5mu])\to \Conid{IO}\;(){}\<[E]%
+\>[B]{} {\lhsCHfunction{createFile}}\mathbin{::}{}\<[16]%
+\>[16]{} {\lhsCHtype{Double}}\to  {\lhsCHtype{Double}}\to  {\lhsCHtype{Int}}\to {}\<[E]%
 \\
-\>[B]{}\Varid{createFile}\;\Varid{tlr}\;\Varid{tmlbs}\;\Varid{seed}\;(\Varid{seqno},\Varid{s})\mathrel{=}\mathbf{do}{}\<[E]%
+\>[16]{}( {\lhsCHtype{Int}},[\mskip1.5mu  {\lhsCHtype{Packet}}\mskip1.5mu])\to \Conid{IO}\;(){}\<[E]%
+\\[\blanklineskip]%
+\>[B]{} {\lhsCHfunction{createFile}}\;\Varid{tlr}\;\Varid{tmlbs}\;\Varid{seed}\;(\Varid{seqno},\Varid{s})\mathrel{=}\mathbf{do}{}\<[E]%
 \\
 \>[B]{}\hsindent{3}{}\<[3]%
 \>[3]{}\mathbf{let}\;\Varid{outfile}{}\<[17]%
-\>[17]{}\mathrel{=}\Varid{concat}\;[\mskip1.5mu \text{\tt \char34 trace\char95 \char34}{}\<[E]%
+\>[17]{}\mathrel{=}\Varid{concat}\;[\mskip1.5mu \color{string}\text{\tt \char34 trace\char95 \char34}{}\<[E]%
 \\
 \>[17]{}\hsindent{10}{}\<[27]%
-\>[27]{},\Varid{show}\;\Varid{tlr}{}\<[E]%
+\>[27]{}, {\lhsCHfunction{show}}\;\Varid{tlr}{}\<[E]%
 \\
 \>[17]{}\hsindent{10}{}\<[27]%
-\>[27]{},\text{\tt \char34 \char95 \char34}{}\<[E]%
+\>[27]{},\color{string}\text{\tt \char34 \char95 \char34}{}\<[E]%
 \\
 \>[17]{}\hsindent{10}{}\<[27]%
-\>[27]{},\Varid{show}\;\Varid{tmlbs}{}\<[E]%
+\>[27]{}, {\lhsCHfunction{show}}\;\Varid{tmlbs}{}\<[E]%
 \\
 \>[17]{}\hsindent{10}{}\<[27]%
-\>[27]{},\text{\tt \char34 \char95 \char34}{}\<[E]%
+\>[27]{},\color{string}\text{\tt \char34 \char95 \char34}{}\<[E]%
 \\
 \>[17]{}\hsindent{10}{}\<[27]%
-\>[27]{},\Varid{show}\;\Varid{seed}{}\<[E]%
+\>[27]{}, {\lhsCHfunction{show}}\;\Varid{seed}{}\<[E]%
 \\
 \>[17]{}\hsindent{10}{}\<[27]%
-\>[27]{},\text{\tt \char34 \char95 \char34}{}\<[E]%
+\>[27]{},\color{string}\text{\tt \char34 \char95 \char34}{}\<[E]%
 \\
 \>[17]{}\hsindent{10}{}\<[27]%
-\>[27]{},\Varid{show}\;\Varid{seqno}{}\<[E]%
+\>[27]{}, {\lhsCHfunction{show}}\;\Varid{seqno}{}\<[E]%
 \\
 \>[17]{}\hsindent{10}{}\<[27]%
-\>[27]{},\text{\tt \char34 .txt\char34}\mskip1.5mu]{}\<[E]%
+\>[27]{},\color{string}\text{\tt \char34 .txt\char34}\mskip1.5mu]{}\<[E]%
 \\
 \>[3]{}\hsindent{4}{}\<[7]%
-\>[7]{}\Varid{statsfile}\mathrel{=}\Varid{concat}\;[\mskip1.5mu \text{\tt \char34 stats\char95 \char34}{}\<[E]%
+\>[7]{}\Varid{statsfile}\mathrel{=}\Varid{concat}\;[\mskip1.5mu \color{string}\text{\tt \char34 stats\char95 \char34}{}\<[E]%
 \\
 \>[7]{}\hsindent{20}{}\<[27]%
-\>[27]{},\Varid{show}\;\Varid{tlr}{}\<[E]%
+\>[27]{}, {\lhsCHfunction{show}}\;\Varid{tlr}{}\<[E]%
 \\
 \>[7]{}\hsindent{20}{}\<[27]%
-\>[27]{},\text{\tt \char34 \char95 \char34}{}\<[E]%
+\>[27]{},\color{string}\text{\tt \char34 \char95 \char34}{}\<[E]%
 \\
 \>[7]{}\hsindent{20}{}\<[27]%
-\>[27]{},\Varid{show}\;\Varid{tmlbs}{}\<[E]%
+\>[27]{}, {\lhsCHfunction{show}}\;\Varid{tmlbs}{}\<[E]%
 \\
 \>[7]{}\hsindent{20}{}\<[27]%
-\>[27]{},\text{\tt \char34 \char95 \char34}{}\<[E]%
+\>[27]{},\color{string}\text{\tt \char34 \char95 \char34}{}\<[E]%
 \\
 \>[7]{}\hsindent{20}{}\<[27]%
-\>[27]{},\Varid{show}\;\Varid{seed}{}\<[E]%
+\>[27]{}, {\lhsCHfunction{show}}\;\Varid{seed}{}\<[E]%
 \\
 \>[27]{}\hsindent{1}{}\<[28]%
-\>[28]{},\text{\tt \char34 .txt\char34}\mskip1.5mu]{}\<[E]%
+\>[28]{},\color{string}\text{\tt \char34 .txt\char34}\mskip1.5mu]{}\<[E]%
 \\
 \>[3]{}\hsindent{4}{}\<[7]%
 \>[7]{}\Varid{stats}{}\<[17]%
-\>[17]{}\mathrel{=}\Varid{concat}\;[\mskip1.5mu \text{\tt \char34 Sequence~\char34}{}\<[E]%
+\>[17]{}\mathrel{=}\Varid{concat}\;[\mskip1.5mu \color{string}\text{\tt \char34 Sequence~\char34}{}\<[E]%
 \\
 \>[17]{}\hsindent{10}{}\<[27]%
-\>[27]{},\Varid{show}\;\Varid{seqno}{}\<[E]%
+\>[27]{}, {\lhsCHfunction{show}}\;\Varid{seqno}{}\<[E]%
 \\
 \>[17]{}\hsindent{10}{}\<[27]%
-\>[27]{},\text{\tt \char34 ~lr~=~\char34}{}\<[E]%
+\>[27]{},\color{string}\text{\tt \char34 ~lr~=~\char34}{}\<[E]%
 \\
 \>[17]{}\hsindent{10}{}\<[27]%
-\>[27]{},\Varid{show}\mathbin{\$}\Varid{lr}\;\Varid{s}{}\<[E]%
+\>[27]{}, {\lhsCHfunction{show}} {\lhsCHinfixoperator{\ \mathbin{\ \mathbin{\$}\ }\ }} {\lhsCHfunction{lr}}\;\Varid{s}{}\<[E]%
 \\
 \>[17]{}\hsindent{10}{}\<[27]%
-\>[27]{},\text{\tt \char34 ,~mlbs~=~\char34}{}\<[E]%
+\>[27]{},\color{string}\text{\tt \char34 ,~mlbs~=~\char34}{}\<[E]%
 \\
 \>[17]{}\hsindent{10}{}\<[27]%
-\>[27]{},\Varid{show}\mathbin{\$}\Varid{mlbs}\;\Varid{s}{}\<[E]%
+\>[27]{}, {\lhsCHfunction{show}} {\lhsCHinfixoperator{\ \mathbin{\ \mathbin{\$}\ }\ }} {\lhsCHfunction{mlbs}}\;\Varid{s}{}\<[E]%
 \\
 \>[17]{}\hsindent{10}{}\<[27]%
-\>[27]{},\text{\tt \char34 \char92 n\char34}\mskip1.5mu]{}\<[E]%
+\>[27]{},\color{string}\text{\tt \char34 \char92 n\char34}\mskip1.5mu]{}\<[E]%
 \\[\blanklineskip]%
 \>[B]{}\hsindent{3}{}\<[3]%
-\>[3]{}\Varid{writeFile}\;\Varid{outfile}\mathbin{\$}\Varid{concat}\mathbin{\$}\Varid{map}\;(\Varid{show})\;\Varid{s}{}\<[E]%
+\>[3]{}\Varid{writeFile}\;\Varid{outfile} {\lhsCHinfixoperator{\ \mathbin{\ \mathbin{\$}\ }\ }}\Varid{concat} {\lhsCHinfixoperator{\ \mathbin{\ \mathbin{\$}\ }\ }} {\lhsCHfunction{map}}\;( {\lhsCHfunction{show}})\;\Varid{s}{}\<[E]%
 \\
 \>[B]{}\hsindent{3}{}\<[3]%
 \>[3]{}\Varid{appendFile}\;\Varid{statsfile}\;\Varid{stats}{}\<[E]%
