@@ -308,18 +308,19 @@
 %-}
 
 \begin{document}
-\title{Gilbert Loss Trace Generator}
+\title{Gilbert-model Loss Trace Generator for Instrumentation of Subjective Assessment Campaigns}
 \author{ Mart\'\i n Varela - VTT}
+\date{2012--01--19}
 
 \maketitle
 
 
 \abstract{ This program allows the generation of several accurate (with respect
-to pre--defined target values) loss traces following a simplified Gilbert loss
+to pre-defined target values) loss traces following a simplified Gilbert loss
 model (2-states, one with no losses, and one with loss probability = 1). For
 subjective testing, the challenge lies in getting the right stats within a few
-hundred packets, as test sequences are only $\sim 10s$ long. We take a
-brute-force approach, generating several samples per combination of loss--rate
+hundred packets, as test sequences are only $\sim 10s$long. We take a
+brute-force approach, generating several samples per combination of loss-rate
 and mean loss burst size until enough  sufficiently good traces are generated.  }
 
 \section{Preliminaries}
@@ -371,7 +372,7 @@ the sequence, $LR_{\sigma}$ and $MLBS_{\sigma}$ and the target values is lower
 than a given threshold.
 
 We will define the thresholds at a $5\%$ of $LR_{t}$ for the loss rate, and 0.1
-packets for the mean loss burst size., and so our conditions for accepting a 
+packets for the mean loss burst size, and so our conditions for accepting a 
 sequence as valid are
 $$
 \mid LR_t - LR_{ \sigma }\mid \leq 0.05 \times LR_{t}
@@ -381,7 +382,7 @@ $$
 \mid MLBS_{t} - MLBS_{ \sigma }\mid \leq 0.1
 $$
 
-There is an issue when the definition of the mean loss burst size when no losses
+There is an issue with the definition of the mean loss burst size when no losses
 occur. For some applications, it may be convenient to define it as 1, while in
 other cases it might be better to define it as 0 (as indeed, if there are no
 losses, speaking of the mean loss burst size does not make sense). However, for
@@ -497,8 +498,8 @@ and
 $$
 q = \frac{1}{MLBS_t}
 $$
-where $p$ and $q$ correspond to the probabilities of going from the no--loss
-state to the loss state, and vice--versa, respectively, as seen in Figure~\ref{fig:gilbert}.  
+where $p$ and $q$ correspond to the probabilities of going from the no-loss
+state to the loss state, and vice-versa, respectively, as seen in Figure~\ref{fig:gilbert}.  
 
 \begin{figure}[h]
 \centering
@@ -508,7 +509,7 @@ state to the loss state, and vice--versa, respectively, as seen in Figure~\ref{f
 \end{figure}
 
 
-Sequences need to be generated with a pre--defined length, and we will need to
+Sequences need to be generated with a pre-defined length, and we will need to
 obtain several different sequences with similar statistical loss behavior. So if
 we want to obtain $k$ sequences with a certain loss rate $tlr$ and mean loss
 burst size $tmlbs$ within a certain tolerance as defined in
@@ -539,25 +540,29 @@ We can then write
 \end{hscode}\resethooks
 
 It now remains the task of generating the actual sequences with the desired
-targets.  Since it would be useful to obtain repeatable traces, we start by
-taking a seed as an argument. We'll use that seed to generate a pseudo--random
+targets. Since it would be useful to obtain repeatable traces, we start by
+taking a seed as an argument. We'll use that seed to generate a pseudo-random
 sequence of integer seeds for creating new generators for the actual packet loss
-sequences.  In this way, we get the repeatability, and we keep a larger portion
-of the code pure.
+sequences. In this way, we get the repeatability, and we keep a larger portion
+of the code pure. Since there are no guarantees on whether the desired
+combination of loss rate and mean burst size is attainable, and we want to avoid
+a non-halting situation, we'll add some bounds to our search space by limiting
+the number of seeds to be used. We will chose an arbitrary limit for this, but
+if need be, it could be parametrized.
 
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
-\>[B]{} {\lhsCHfunction{seeds}}\;\Varid{s}\mathrel{=}(\Varid{randoms} {\lhsCHinfixoperator{\ \mathbin{\ \mathbin{\$}\ }\ }} {\lhsCHfunction{mkStdGen}}\;\Varid{s})\mathbin{::}[\mskip1.5mu  {\lhsCHtype{Int}}\mskip1.5mu]{}\<[E]%
+\>[B]{} {\lhsCHfunction{seeds}}\;\Varid{s}\mathrel{=} {\lhsCHfunction{take}}\;\color{numeral}{ 50000 }\;(\Varid{randoms} {\lhsCHinfixoperator{\ \mathbin{\ \mathbin{\$}\ }\ }} {\lhsCHfunction{mkStdGen}}\;\Varid{s})\mathbin{::}[\mskip1.5mu  {\lhsCHtype{Int}}\mskip1.5mu]{}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
 
-In order to generate the sequences, we need to implement the two--state Markov
+In order to generate the sequences, we need to implement the two-state Markov
 chain depicted in Figure~\ref{fig:gilbert}. We use one of the previously
 generated seeds to feed a new generator, and use this to simulate the chain.
 So, the creation of a sequences takes as arguments the transition probabilities
 for the Markov chain, the desired sequence length, and a seed for the
-pseudo--random number generator. We always start from a loss--free state.
+pseudo-random number generator. We always start from a loss-free state.
 
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
@@ -668,7 +673,7 @@ pseudo--random number generator. We always start from a loss--free state.
 Having the means to generate sequences with the desired target loss
 characteristics, we just create an infinite list of such sequences, from which
 we will then choose as many as we need. It should be noted that depending on the
-target values and tolerances, this might result in a non--halting computation,
+target values and tolerances, this might result in a non-halting computation,
 as some combinations of target values and sequence length are not feasible.
 
 \begin{hscode}\SaveRestoreHook
