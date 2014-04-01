@@ -286,9 +286,11 @@ sequences tlr tmlbs k s  =  map (createSequence tlr tmlbs k) $
 With the sequence generation solved, we can now build the rest of the program,
 which will take arguments for the target loss rate, the target mean loss burst
 size, the length of the sequences to be generated, the number of sequences to be
-generated, and a seed for the RNG. The program will then create a file per
-sequence generated, and a file with the actual loss rates and mean loss burst 
-sizes of the sequences generated, for validation purposes.
+generated, and a seed for the RNG. The program will then create two files per
+sequence generated (one with binary information for each packet, and one with a
+list of lost packets given by their position in the flow), and a file with the
+actual loss rates and mean loss burst sizes of the sequences generated, for
+validation purposes.
 
 \begin{code}
 
@@ -322,6 +324,15 @@ createFile tlr tmlbs seed (seqno, s) = do
                           , "_"                            
                           , show seqno
                           , ".txt"]
+      kaufile   = concat ["kau_trace_"
+                          , show tlr
+                          , "_"
+                          , show tmlbs
+                          , "_"                            
+                          , show seed
+                          , "_"                            
+                          , show seqno
+                          , ".txt"]
       statsfile = concat ["stats_"
                           , show tlr
                           , "_"
@@ -338,6 +349,7 @@ createFile tlr tmlbs seed (seqno, s) = do
                           , "\n"]
           
   writeFile outfile $ concat $ map (show) s
+  writeFile kaufile $ concat $ intersperse "\n" $  map (show.fst) $ filter (\x -> snd x == P_LOST )  $ zip [1..] s
   appendFile statsfile stats
 
 \end{code}
