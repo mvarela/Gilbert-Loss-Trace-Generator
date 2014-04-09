@@ -349,7 +349,9 @@ createFile tlr tmlbs seed (seqno, s) = do
                           , "\n"]
           
   writeFile outfile $ concat $ map (show) s
-  writeFile kaufile $ concat $ intersperse "\n" $  map (show.fst) $ filter (\x -> snd x == P_LOST )  $ zip [1..] s
+  writeFile kaufile $ concat $ intersperse "\n" $
+            map (show.fst) $
+            filter (\x -> snd x == P_LOST )  $ zip [1..] s
   appendFile statsfile stats
 
 \end{code}

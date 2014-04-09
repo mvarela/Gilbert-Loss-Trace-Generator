@@ -696,9 +696,11 @@ as some combinations of target values and sequence length are not feasible.
 With the sequence generation solved, we can now build the rest of the program,
 which will take arguments for the target loss rate, the target mean loss burst
 size, the length of the sequences to be generated, the number of sequences to be
-generated, and a seed for the RNG. The program will then create a file per
-sequence generated, and a file with the actual loss rates and mean loss burst 
-sizes of the sequences generated, for validation purposes.
+generated, and a seed for the RNG. The program will then create two files per
+sequence generated (one with binary information for each packet, and one with a
+list of lost packets given by their position in the flow), and a file with the
+actual loss rates and mean loss burst sizes of the sequences generated, for
+validation purposes.
 
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
@@ -760,10 +762,12 @@ The creation of the trace and statistics files is handled like so:
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{3}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{7}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{13}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{16}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{17}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{27}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{28}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{46}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
 \>[B]{} {\lhsCHfunction{createFile}}\mathbin{::}{}\<[16]%
 \>[16]{} {\lhsCHtype{Double}}\to  {\lhsCHtype{Double}}\to  {\lhsCHtype{Int}}\to {}\<[E]%
@@ -775,6 +779,34 @@ The creation of the trace and statistics files is handled like so:
 \>[B]{}\hsindent{3}{}\<[3]%
 \>[3]{}\mathbf{let}\;\Varid{outfile}{}\<[17]%
 \>[17]{}\mathrel{=}\Varid{concat}\;[\mskip1.5mu \color{string}\text{\tt \char34 trace\char95 \char34}{}\<[E]%
+\\
+\>[17]{}\hsindent{10}{}\<[27]%
+\>[27]{}, {\lhsCHfunction{show}}\;\Varid{tlr}{}\<[E]%
+\\
+\>[17]{}\hsindent{10}{}\<[27]%
+\>[27]{},\color{string}\text{\tt \char34 \char95 \char34}{}\<[E]%
+\\
+\>[17]{}\hsindent{10}{}\<[27]%
+\>[27]{}, {\lhsCHfunction{show}}\;\Varid{tmlbs}{}\<[E]%
+\\
+\>[17]{}\hsindent{10}{}\<[27]%
+\>[27]{},\color{string}\text{\tt \char34 \char95 \char34}{}\<[E]%
+\\
+\>[17]{}\hsindent{10}{}\<[27]%
+\>[27]{}, {\lhsCHfunction{show}}\;\Varid{seed}{}\<[E]%
+\\
+\>[17]{}\hsindent{10}{}\<[27]%
+\>[27]{},\color{string}\text{\tt \char34 \char95 \char34}{}\<[E]%
+\\
+\>[17]{}\hsindent{10}{}\<[27]%
+\>[27]{}, {\lhsCHfunction{show}}\;\Varid{seqno}{}\<[E]%
+\\
+\>[17]{}\hsindent{10}{}\<[27]%
+\>[27]{},\color{string}\text{\tt \char34 .txt\char34}\mskip1.5mu]{}\<[E]%
+\\
+\>[3]{}\hsindent{4}{}\<[7]%
+\>[7]{}\Varid{kaufile}{}\<[17]%
+\>[17]{}\mathrel{=}\Varid{concat}\;[\mskip1.5mu \color{string}\text{\tt \char34 kau\char95 trace\char95 \char34}{}\<[E]%
 \\
 \>[17]{}\hsindent{10}{}\<[27]%
 \>[27]{}, {\lhsCHfunction{show}}\;\Varid{tlr}{}\<[E]%
@@ -845,6 +877,16 @@ The creation of the trace and statistics files is handled like so:
 \\[\blanklineskip]%
 \>[B]{}\hsindent{3}{}\<[3]%
 \>[3]{}\Varid{writeFile}\;\Varid{outfile} {\lhsCHinfixoperator{\ \mathbin{\ \mathbin{\$}\ }\ }}\Varid{concat} {\lhsCHinfixoperator{\ \mathbin{\ \mathbin{\$}\ }\ }} {\lhsCHfunction{map}}\;( {\lhsCHfunction{show}})\;\Varid{s}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{writeFile}\;\Varid{kaufile} {\lhsCHinfixoperator{\ \mathbin{\ \mathbin{\$}\ }\ }}\Varid{concat} {\lhsCHinfixoperator{\ \mathbin{\ \mathbin{\$}\ }\ }}\Varid{intersperse}\;\color{string}\text{\tt \char34 \char92 n\char34} {\lhsCHinfixoperator{\ \mathbin{\ \mathbin{\$}\ }\ }}{}\<[E]%
+\\
+\>[3]{}\hsindent{10}{}\<[13]%
+\>[13]{} {\lhsCHfunction{map}}\;( {\lhsCHfunction{show}} {\lhsCHinfixoperator{\ \mathbin{.}\ }}\Varid{fst}) {\lhsCHinfixoperator{\ \mathbin{\ \mathbin{\$}\ }\ }}{}\<[E]%
+\\
+\>[3]{}\hsindent{10}{}\<[13]%
+\>[13]{} {\lhsCHfunction{filter}}\;(\lambda \Varid{x}\to \Varid{snd}\;\Varid{x} {\lhsCHinfixoperator{\ \mathbin{\ \equiv\ }\ }} {\lhsCHconstructor{P$_{\textbf{LOST}}$}}){}\<[46]%
+\>[46]{} {\lhsCHinfixoperator{\ \mathbin{\ \mathbin{\$}\ }\ }} {\lhsCHfunction{zip}}\;[\mskip1.5mu \color{numeral}{ 1 }\mathinner{\ldotp\ldotp}\mskip1.5mu]\;\Varid{s}{}\<[E]%
 \\
 \>[B]{}\hsindent{3}{}\<[3]%
 \>[3]{}\Varid{appendFile}\;\Varid{statsfile}\;\Varid{stats}{}\<[E]%
